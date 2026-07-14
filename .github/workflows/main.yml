@@ -1,0 +1,38 @@
+name: Video Guncelleme
+
+on:
+  schedule:
+    - cron: '0 9 * * *' 
+  workflow_dispatch:
+
+jobs:
+  update-videos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: PHP ile JSON Olustur
+        env:
+          TOKEN: ${{ secrets.INSTAGRAM_TOKEN }}
+          ID: ${{ secrets.ACCOUNT_ID }}
+        run: |
+          php -r '
+            $api_url = "https://graph.instagram.com/v21.0/" . getenv("ID") . "/media?fields=media_url,media_type&access_token=" . getenv("TOKEN");
+            $response = file_get_contents($api_url);
+            $data = json_decode($response, true);
+            $videos = [];
+            if(isset($data["data"])) {
+                foreach($data["data"] as $p) {
+                   if(isset($p["media_type"]) && in_array($p["media_type"], ["VIDEO", "REELS", "CAROUSEL_ALBUM"])) {
+                       $videos[] = $p["media_url"];
+                   }
+                }
+            }
+            file_put_contents("videolar.json", json_encode(["videolar" => $videos]));
+          '
+      - name: Degisiklikleri Kaydet ve GitHuba Gonder
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add videolar.json
+          git commit -m "Video listesi otomatik guncellendi" || echo "Degisiklik yok"
+          git push
