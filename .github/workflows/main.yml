@@ -2,7 +2,8 @@ name: Video Guncelleme
 
 on:
   schedule:
-    - cron: '0 9 * * *' 
+    # Her saat başı çalışması için güncellendi
+    - cron: '0 * * * *' 
   workflow_dispatch:
 
 permissions:
@@ -25,6 +26,7 @@ jobs:
             $videos = [];
             if(isset($data["data"])) {
                 foreach($data["data"] as $p) {
+                   // Video, Reels veya Carousel içindeki medya URLlerini al
                    if(isset($p["media_type"]) && in_array($p["media_type"], ["VIDEO", "REELS", "CAROUSEL_ALBUM"])) {
                        $videos[] = $p["media_url"];
                    }
@@ -37,5 +39,6 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add videolar.json
-          git commit -m "Video listesi otomatik guncellendi" || echo "Degisiklik yok"
+          # Commit atılacak değişiklik yoksa hata vermemesi için || true ekledik
+          git commit -m "Video listesi otomatik guncellendi" || true
           git push
