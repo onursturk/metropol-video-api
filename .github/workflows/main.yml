@@ -20,7 +20,8 @@ jobs:
           ID: ${{ secrets.ACCOUNT_ID }}
         run: |
           php -r '
-            $api_url = "https://graph.instagram.com/v21.0/" . getenv("ID") . "/media?fields=media_url,media_type&access_token=" . getenv("TOKEN");
+            // limit=100 parametresi ile daha fazla veri çekiyoruz
+            $api_url = "https://graph.instagram.com/v21.0/" . getenv("ID") . "/media?fields=media_url,media_type&limit=100&access_token=" . getenv("TOKEN");
             $response = file_get_contents($api_url);
             $data = json_decode($response, true);
             $videos = [];
