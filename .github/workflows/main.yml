@@ -33,7 +33,14 @@ jobs:
                    }
                 }
             }
-            file_put_contents("videolar.json", json_encode(["videolar" => $videos]));
+            
+            // YENİ: JSON İçeriğini Hazırlama (QR Kodu da ekliyoruz)
+            $json_icerik = [
+                "videolar" => $videos,
+                "qr_url" => "https://raw.githubusercontent.com/onursturk/metropol-video-api/refs/heads/main/mini_qr.png"
+            ];
+            
+            file_put_contents("videolar.json", json_encode($json_icerik));
           '
       - name: Degisiklikleri Kaydet ve GitHuba Gonder
         run: |
@@ -41,5 +48,5 @@ jobs:
           git config user.email github-actions@github.com
           git add videolar.json
           # Commit atılacak değişiklik yoksa hata vermemesi için || true ekledik
-          git commit -m "Video listesi otomatik guncellendi" || true
+          git commit -m "Video listesi ve QR linki otomatik guncellendi" || true
           git push
